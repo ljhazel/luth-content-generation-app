@@ -778,8 +778,7 @@ Technical rules — follow exactly or the image will fail to render:
 - No markdown, no code fences, no explanation text before or after`;
 
   try {
-    const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.anthropic.com/v1/messages');
-    const response = await fetch(proxyUrl, {
+    const response = await fetch('https://luke-anthropic-proxy.luke-586.workers.dev/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
