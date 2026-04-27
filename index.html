@@ -530,6 +530,15 @@ let generatedHTML = null;
 let pollInterval = null;
 let knownRowCount = 0;
 
+// Restore saved API key on load
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('lr_anthropic_key');
+  if (saved) document.getElementById('apiKey').value = saved;
+  document.getElementById('apiKey').addEventListener('input', (e) => {
+    localStorage.setItem('lr_anthropic_key', e.target.value.trim());
+  });
+});
+
 // Toast
 function showToast(msg, type='') {
   const t = document.getElementById('toast');
@@ -769,7 +778,8 @@ Technical rules — follow exactly or the image will fail to render:
 - No markdown, no code fences, no explanation text before or after`;
 
   try {
-    const response = await fetch('https://corsproxy.io/?https://api.anthropic.com/v1/messages', {
+    const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.anthropic.com/v1/messages');
+    const response = await fetch(proxyUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
