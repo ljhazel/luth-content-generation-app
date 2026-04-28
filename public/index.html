@@ -611,22 +611,23 @@
     display: flex;
     gap: 8px;
     align-items: flex-end;
+    width: 100%;
   }
 
   .chat-textarea {
     flex: 1;
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 10px 14px;
+    padding: 12px 14px;
     font-size: 13px;
     font-family: 'DM Sans', sans-serif;
     color: var(--text);
     resize: none;
-    min-height: 44px;
-    max-height: 120px;
+    min-height: 100px;
+    max-height: 200px;
     outline: none;
     transition: border-color 0.2s;
-    line-height: 1.5;
+    line-height: 1.6;
   }
 
   .chat-textarea:focus { border-color: var(--lr-navy); }
@@ -739,6 +740,122 @@
     30% { transform: translateY(-6px); }
   }
 
+
+  /* Content History */
+  .history-section {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .history-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--white);
+  }
+
+  .history-card:hover {
+    border-color: var(--lr-navy);
+    box-shadow: 0 2px 8px rgba(38,69,93,0.08);
+  }
+
+  .history-card.active {
+    border-color: var(--lr-navy);
+  }
+
+  .history-thumb {
+    width: 100%;
+    height: 80px;
+    background: var(--lr-sky);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .history-thumb iframe {
+    width: 400%;
+    height: 400%;
+    transform: scale(0.25);
+    transform-origin: top left;
+    border: none;
+    pointer-events: none;
+  }
+
+  .history-thumb-empty {
+    font-size: 24px;
+    color: var(--lr-mist);
+  }
+
+  .history-info {
+    padding: 8px 12px;
+  }
+
+  .history-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--lr-navy);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+  }
+
+  .history-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .history-date {
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .history-versions {
+    font-size: 10px;
+    color: var(--lr-slate);
+    background: var(--lr-sky);
+    padding: 1px 6px;
+    border-radius: 10px;
+  }
+
+  .history-empty {
+    text-align: center;
+    padding: 20px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .btn-clear-history {
+    background: none;
+    border: none;
+    font-size: 10px;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 2px 4px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .btn-clear-history:hover { color: var(--lr-red); }
+
 </style>
 </head>
 <body>
@@ -762,14 +879,6 @@
   <!-- Sidebar -->
   <aside class="sidebar">
 
-    <!-- API Key -->
-    <div class="section-label">Configuration</div>
-    <div class="api-block">
-      <label>Anthropic API Key</label>
-      <input type="password" id="apiKey" placeholder="sk-ant-api03-..." />
-      <p class="api-note">Never shared. Stored in this session only.</p>
-    </div>
-
     <!-- Sheet rows -->
     <div class="sheet-header">
       <div class="section-label" style="margin:0">Content Queue</div>
@@ -784,6 +893,17 @@
       <div class="empty-state">Loading your sheet...</div>
     </div>
 
+    <!-- Content History -->
+    <div class="history-section">
+      <div class="history-header">
+        <div class="section-label" style="margin:0">Content History</div>
+        <button class="btn-clear-history" onclick="clearHistory()">Clear all</button>
+      </div>
+      <div class="history-list" id="historyList">
+        <div class="history-empty">No history yet. Generated infographics will appear here.</div>
+      </div>
+    </div>
+
   </aside>
 
   <!-- Main -->
@@ -791,7 +911,7 @@
     <div class="main-empty">
       <div class="main-empty-icon">✦</div>
       <h2>Ready to create</h2>
-      <p>Set your API key, then select a row marked RUN from the queue to generate an infographic.</p>
+      <p>Select a row marked RUN from the queue to start generating infographics.</p>
     </div>
   </main>
 
@@ -813,13 +933,12 @@ let conversationHistory = [];  // Full message history for Claude
 let versionHistory = [];       // { html, thinking, feedback, timestamp }
 let activeVersion = -1;        // Index of currently displayed version
 
-// Restore saved API key on load
+// API key is stored in Vercel environment variable
+// The /api/generate endpoint handles auth server-side
+// No client-side API key needed
+
 window.addEventListener('load', () => {
-  const saved = localStorage.getItem('lr_anthropic_key');
-  if (saved) document.getElementById('apiKey').value = saved;
-  document.getElementById('apiKey').addEventListener('input', (e) => {
-    localStorage.setItem('lr_anthropic_key', e.target.value.trim());
-  });
+  renderHistory();
 });
 
 // Toast
@@ -1208,7 +1327,7 @@ Source: ${row['Source'] || 'Luth Research — luthresearch.com'}
 Brand guidelines:
 - Colors: #26455D (dark blue), #9D2D3F (red), #96B2B8 (blue-grey), #DEEBF5 (light blue background), #4B616D (medium blue)
 - Primary font: Helvetica, Arial, sans-serif (body text, labels, captions, data points)
-- Secondary font: Zilla Slab (sub headings only) — load via Google Fonts in the HTML head: <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&display=swap" rel="stylesheet">
+- Secondary font: Zilla Slab (headings and titles only) — load via Google Fonts in the HTML head: <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&display=swap" rel="stylesheet">
 - Always include the Google Fonts link tag in the generated HTML head section
 - Style: Clean, professional, data-driven, B2B
 - Include Luth Research branding visibly
@@ -1237,9 +1356,8 @@ When the user asks to keep something the same, preserve it precisely and only ch
 }
 
 async function sendChatMessage(overrideText) {
-  const apiKey = document.getElementById('apiKey').value.trim();
-  if (!apiKey) { showToast('Please enter your Anthropic API key first.', 'error'); return; }
   if (!selectedRow) return;
+  const apiKey = ''; // API key handled server-side via Vercel env var
 
   const inputEl = document.getElementById('chatInput');
   const userText = overrideText || (inputEl ? inputEl.value.trim() : '');
@@ -1285,7 +1403,6 @@ async function sendChatMessage(overrideText) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': apiKey,
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
@@ -1340,6 +1457,8 @@ async function sendChatMessage(overrideText) {
 
     // Persist session to localStorage
     saveSession();
+    // Save to content history
+    saveToHistory(selectedRow, versionHistory);
 
     // Update UI
     removeTypingIndicator();
@@ -1450,6 +1569,115 @@ function downloadPNG() {
   a.click();
   URL.revokeObjectURL(url);
   showToast('Downloaded! Open in browser to screenshot as PNG.');
+}
+
+
+// ============================================================
+// CONTENT HISTORY
+// ============================================================
+
+function getAllHistory() {
+  try {
+    const raw = localStorage.getItem('lr_content_history');
+    return raw ? JSON.parse(raw) : [];
+  } catch(e) { return []; }
+}
+
+function saveToHistory(row, versions) {
+  const history = getAllHistory();
+  const key = (row['Title'] || 'untitled').replace(/\s+/g, '_');
+  const existing = history.findIndex(h => h.key === key);
+  const entry = {
+    key,
+    title: row['Title'] || 'Untitled',
+    description: row['Description'] || '',
+    savedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+    versionCount: versions.length,
+    latestHTML: versions[versions.length - 1]?.html || '',
+    versions: versions.map(v => ({ html: v.html, thinking: v.thinking, timestamp: v.timestamp }))
+  };
+  if (existing >= 0) {
+    history[existing] = entry;
+  } else {
+    history.unshift(entry);
+  }
+  // Keep max 20 items
+  if (history.length > 20) history.pop();
+  try {
+    localStorage.setItem('lr_content_history', JSON.stringify(history));
+  } catch(e) {
+    // Storage full — remove oldest
+    history.pop();
+    localStorage.setItem('lr_content_history', JSON.stringify(history));
+  }
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  if (!list) return;
+  const history = getAllHistory();
+  if (history.length === 0) {
+    list.innerHTML = '<div class="history-empty">No history yet. Generated infographics will appear here.</div>';
+    return;
+  }
+  list.innerHTML = history.map((entry, i) => {
+    const isActive = selectedRow && (selectedRow['Title'] || '').replace(/\s+/g, '_') === entry.key;
+    return `<div class="history-card ${isActive ? 'active' : ''}" onclick="loadFromHistory(${i})">
+      <div class="history-thumb">
+        ${entry.latestHTML
+          ? `<iframe srcdoc="${entry.latestHTML.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}"></iframe>`
+          : '<div class="history-thumb-empty">🖼</div>'}
+      </div>
+      <div class="history-info">
+        <div class="history-title">${entry.title}</div>
+        <div class="history-meta">
+          <span class="history-date">${entry.savedAt}</span>
+          <span class="history-versions">${entry.versionCount} version${entry.versionCount !== 1 ? 's' : ''}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function loadFromHistory(idx) {
+  const history = getAllHistory();
+  const entry = history[idx];
+  if (!entry) return;
+
+  // Restore version history
+  versionHistory = entry.versions || [];
+  activeVersion = versionHistory.length - 1;
+  generatedHTML = activeVersion >= 0 ? versionHistory[activeVersion].html : null;
+
+  // Restore conversation as empty but show versions
+  conversationHistory = versionHistory.map((v, i) => ({
+    role: 'assistant',
+    content: v.thinking || '',
+    thinking: v.thinking || '',
+    rawResponse: v.html,
+    versionIndex: i,
+    time: v.timestamp || ''
+  }));
+
+  // Find matching row in sheet or create a stub
+  const matchingRow = sheetData.find(r => (r['Title'] || '').replace(/\s+/g, '_') === entry.key);
+  if (matchingRow) {
+    selectedRow = matchingRow;
+  } else {
+    selectedRow = { Title: entry.title, Description: entry.description };
+  }
+
+  renderMain();
+  renderHistory();
+  showToast('Loaded: ' + entry.title);
+}
+
+function clearHistory() {
+  if (!confirm('Clear all content history? This cannot be undone.')) return;
+  localStorage.removeItem('lr_content_history');
+  renderHistory();
+  showToast('History cleared');
 }
 
 // Poll for new rows every 60 seconds
