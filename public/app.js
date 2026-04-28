@@ -11,6 +11,11 @@ let conversationHistory = [];  // Full message history for Claude
 let versionHistory = [];       // { html, thinking, feedback, timestamp }
 let activeVersion = -1;        // Index of currently displayed version
 
+// Reference library
+const DRIVE_FOLDER_ID = '1gzn1PglnzGeY024YYEpY3G2RSRbYmO21';
+let referenceImages = [];      // { name, url, base64, selected }
+let referencesLoaded = false;
+
 // API key is stored in Vercel environment variable
 // The /api/generate endpoint handles auth server-side
 // No client-side API key needed
@@ -277,7 +282,7 @@ function renderMain() {
         </div>
         <div class="chat-input-area">
           <div class="chat-input-row">
-            <textarea class="chat-textarea" id="chatInput" placeholder="${versionHistory.length === 0 ? 'Generate your infographic...' : 'Ask for changes, e.g. make the headline bolder...'}" rows="1" onkeydown="handleChatKey(event)"></textarea>
+            <textarea class="chat-textarea" id="chatInput" placeholder="${versionHistory.length === 0 ? 'Generate your first infographic...' : 'Ask for changes, e.g. make the headline bolder...'}" rows="1" onkeydown="handleChatKey(event)"></textarea>
             <button class="chat-send-btn" onclick="sendChatMessage()" id="chatSendBtn" title="Send">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             </button>
@@ -296,7 +301,7 @@ function renderChatMessages() {
     return `<div class="chat-empty">
       <div class="chat-empty-icon">💬</div>
       <div class="chat-empty-title">Start the conversation</div>
-      <div class="chat-empty-sub">Generate your infographic or type a message to get started. Claude will remember every version.</div>
+      <div class="chat-empty-sub">Generate your first infographic or type a message to get started. Claude will remember every version.</div>
     </div>`;
   }
 
@@ -396,6 +401,8 @@ function buildSystemPrompt() {
 
 You are working with the user to design a LinkedIn infographic. You have memory of all previous versions in this conversation.
 
+If reference images are provided at the start of the conversation, analyze them carefully before designing. Study their layout structure, color balance, typography hierarchy, use of shapes, and overall visual style. Your new infographic should feel consistent with these references while being original content.
+
 Content brief:
 Title: ${row['Title'] || ''}
 Description: ${row['Description'] || ''}
@@ -406,8 +413,8 @@ Source: ${row['Source'] || 'Luth Research — luthresearch.com'}
 
 Brand guidelines:
 - Colors: #26455D (dark blue), #9D2D3F (red), #96B2B8 (blue-grey), #DEEBF5 (light blue background), #4B616D (medium blue)
-- Primary font: Helvetica (headings, titles, numbers, and data points)
-- Secondary font: Zilla Slab (body text and descriptive copy only — never use for headlines, titles, stats, or numbers) — load via Google Fonts in the HTML head: <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&display=swap" rel="stylesheet">
+- Primary font: Helvetica, Arial, sans-serif (body text, labels, captions, data points)
+- Secondary font: Zilla Slab (headings and titles only) — load via Google Fonts in the HTML head: <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&display=swap" rel="stylesheet">
 - Always include the Google Fonts link tag in the generated HTML head section
 - Style: Clean, professional, data-driven, B2B
 - Include Luth Research branding visibly
@@ -416,7 +423,7 @@ Brand guidelines:
 
 Technical rules — follow exactly:
 - Canvas must be exactly 1200x627px
-- External fonts are allowed via Google Fonts only — always load Zilla Slab for body text and descriptive copy only
+- External fonts are allowed via Google Fonts only — always load Zilla Slab for headings
 - No JavaScript, no animations, no CSS transitions
 - All content visible immediately on page load
 - Single embedded style block only
@@ -471,12 +478,28 @@ async function sendChatMessage(overrideText) {
   }
 
   // Build messages array for API — include full history
+  const selectedRefs = getSelectedReferences();
   const messages = conversationHistory
     .filter(m => m.role === 'user' || m.role === 'assistant')
-    .map(m => ({
-      role: m.role,
-      content: m.role === 'user' ? m.content : m.rawResponse || m.content
-    }));
+    .map((m, idx) => {
+      // On first user message, attach reference images if any selected
+      if (m.role === 'user' && idx === 0 && selectedRefs.length > 0) {
+        return {
+          role: 'user',
+          content: [
+            ...selectedRefs.map(ref => ({
+              type: 'image',
+              source: { type: 'base64', media_type: 'image/png', data: ref.base64 }
+            })),
+            { type: 'text', text: m.content }
+          ]
+        };
+      }
+      return {
+        role: m.role,
+        content: m.role === 'user' ? m.content : m.rawResponse || m.content
+      };
+    });
 
   try {
     const response = await fetch('/api/generate', {
@@ -781,6 +804,123 @@ function clearHistory() {
   localStorage.removeItem('lr_content_history');
   renderHistory();
   showToast('History cleared');
+}
+
+
+// ============================================================
+// REFERENCE LIBRARY — Google Drive folder of past infographics
+// ============================================================
+
+async function loadReferenceLibrary() {
+  if (referencesLoaded) return;
+  const listEl = document.getElementById('referenceList');
+  if (listEl) listEl.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:8px;">Loading references...</div>';
+
+  try {
+    // Use Google Drive API v3 public folder listing
+    const apiUrl = `https://www.googleapis.com/drive/v3/files?q='${DRIVE_FOLDER_ID}'+in+parents+and+mimeType='image/png'+and+trashed=false&fields=files(id,name,thumbnailLink,webContentLink)&key=AIzaSyD-placeholder`;
+
+    // Since we can't use API key in client, use the export URL pattern directly
+    // Fetch folder page via corsproxy to get file IDs
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://drive.google.com/drive/folders/${DRIVE_FOLDER_ID}`)}`;
+    const res = await fetch(proxyUrl);
+    const html = await res.text();
+
+    // Extract file IDs from the folder page HTML
+    const fileMatches = [...html.matchAll(/\/file\/d\/([a-zA-Z0-9_-]{10,})\//g)];
+    const nameMatches = [...html.matchAll(/data-tooltip="([^"]+\.png)"/gi)];
+
+    const uniqueIds = [...new Set(fileMatches.map(m => m[1]))].slice(0, 15);
+
+    if (uniqueIds.length === 0) {
+      if (listEl) listEl.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:8px;">No PNG files found. Make sure folder is shared publicly.</div>';
+      return;
+    }
+
+    referenceImages = uniqueIds.map((id, i) => ({
+      id,
+      name: nameMatches[i] ? nameMatches[i][1] : `Reference ${i + 1}`,
+      thumbUrl: `https://drive.google.com/thumbnail?id=${id}&sz=w200`,
+      exportUrl: `https://drive.google.com/uc?export=download&id=${id}`,
+      selected: false,
+      base64: null
+    }));
+
+    referencesLoaded = true;
+    renderReferenceLibrary();
+  } catch(e) {
+    if (listEl) listEl.innerHTML = `<div style="font-size:11px;color:var(--lr-red);padding:8px;">Could not load references: ${e.message}</div>`;
+  }
+}
+
+function renderReferenceLibrary() {
+  const listEl = document.getElementById('referenceList');
+  if (!listEl || referenceImages.length === 0) return;
+
+  const selectedCount = referenceImages.filter(r => r.selected).length;
+
+  listEl.innerHTML = `
+    <div style="font-size:10px;color:var(--muted);margin-bottom:8px;">
+      Select up to 3 references for Claude to analyze
+      ${selectedCount > 0 ? `<span style="color:var(--lr-navy);font-weight:600;"> · ${selectedCount} selected</span>` : ''}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+      ${referenceImages.map((ref, i) => `
+        <div onclick="toggleReference(${i})" style="
+          cursor:pointer;
+          border:2px solid ${ref.selected ? 'var(--lr-navy)' : 'var(--border)'};
+          border-radius:8px;
+          overflow:hidden;
+          transition:all 0.2s;
+          position:relative;
+          background:var(--surface);
+        ">
+          <img src="${ref.thumbUrl}" style="width:100%;height:60px;object-fit:cover;display:block;" 
+               onerror="this.style.display='none'" />
+          ${ref.selected ? `<div style="position:absolute;top:4px;right:4px;width:16px;height:16px;background:var(--lr-navy);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>` : ''}
+          <div style="font-size:9px;color:var(--muted);padding:3px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${ref.name}</div>
+        </div>
+      `).join('')}
+    </div>`;
+}
+
+async function toggleReference(idx) {
+  const ref = referenceImages[idx];
+  const selectedCount = referenceImages.filter(r => r.selected).length;
+
+  if (!ref.selected && selectedCount >= 3) {
+    showToast('Maximum 3 reference images. Deselect one first.', 'error');
+    return;
+  }
+
+  ref.selected = !ref.selected;
+
+  // Load base64 if selecting for first time
+  if (ref.selected && !ref.base64) {
+    try {
+      showToast('Loading reference image...');
+      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(ref.exportUrl)}`;
+      const res = await fetch(proxyUrl);
+      const blob = await res.blob();
+      ref.base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch(e) {
+      ref.selected = false;
+      showToast('Could not load reference image', 'error');
+    }
+  }
+
+  renderReferenceLibrary();
+}
+
+function getSelectedReferences() {
+  return referenceImages.filter(r => r.selected && r.base64);
 }
 
 // Poll for new rows every 60 seconds
