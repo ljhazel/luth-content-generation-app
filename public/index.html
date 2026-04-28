@@ -1574,42 +1574,7 @@ function approveInfographic() {
 }
 
 function downloadPNG() {
-  if (!generatedHTML) return;
-
-  // Get the actual displayed width of the preview frame
-  const frame = document.getElementById('previewFrame');
-  const displayWidth = frame ? frame.offsetWidth : 900;
-  const displayHeight = Math.round(displayWidth * 627 / 1200);
-
-  // Wrap the infographic HTML in a page sized to match the display
-  const wrappedHTML = `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { width: ${displayWidth}px; height: ${displayHeight}px; overflow: hidden; background: #F8FAFB; }
-  .scale-wrap { width: 1200px; height: 627px; transform: scale(${displayWidth/1200}); transform-origin: top left; }
-</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-</head>
-<body>
-<div class="scale-wrap">
-${generatedHTML}
-</div>
-</body>
-</html>`;
-
-  const blob = new Blob([wrappedHTML], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = (selectedRow?.['Title'] || 'infographic').replace(/\s+/g,'_') + '_' + new Date().toISOString().split('T')[0] + '.html';
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('Downloaded! Open in browser — it matches exactly what you see in the app.');
-}
-
+ 
 
 // ============================================================
 // CONTENT HISTORY
