@@ -316,12 +316,25 @@
 
   /* Preview frame */
   .preview-frame {
-    background: white;
+    background: #1a1a1a;
     border: 1px solid var(--border);
     border-radius: 12px;
     overflow: hidden;
     margin-bottom: 24px;
     position: relative;
+    width: 100%;
+    aspect-ratio: 1200 / 627;
+  }
+
+  .preview-frame iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1200px;
+    height: 627px;
+    border: none;
+    transform-origin: top left;
+    transform: scale(var(--preview-scale, 0.7));
   }
   .preview-loading {
     display: flex;
@@ -1279,7 +1292,9 @@ function loadVersion(idx) {
   generatedHTML = versionHistory[idx].html;
   const frame = document.getElementById('previewFrame');
   if (frame) {
-    frame.innerHTML = `<iframe class="preview-iframe" style="height:627px" srcdoc="${escapeHtml(generatedHTML)}"></iframe>`;
+    const scale = frame.offsetWidth / 1200;
+    frame.style.setProperty('--preview-scale', scale);
+    frame.innerHTML = `<iframe srcdoc="${escapeHtml(generatedHTML)}" style="width:1200px;height:627px;border:none;position:absolute;top:0;left:0;transform:scale(${scale});transform-origin:top left;"></iframe>`;
   }
   // Update version chips
   document.querySelectorAll('.version-chip').forEach((chip, i) => {
