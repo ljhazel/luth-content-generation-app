@@ -1,7 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/api/generate", "destination": "/api/generate.js" },
-    { "source": "/app.js", "destination": "/public/app.js" },
-    { "source": "/(.*)", "destination": "/public/index.html" }
-  ]
-}
