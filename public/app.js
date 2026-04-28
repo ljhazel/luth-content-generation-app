@@ -277,7 +277,7 @@ function renderMain() {
         </div>
         <div class="chat-input-area">
           <div class="chat-input-row">
-            <textarea class="chat-textarea" id="chatInput" placeholder="${versionHistory.length === 0 ? 'Generate your first infographic...' : 'Ask for changes, e.g. make the headline bolder...'}" rows="1" onkeydown="handleChatKey(event)"></textarea>
+            <textarea class="chat-textarea" id="chatInput" placeholder="${versionHistory.length === 0 ? 'Generate your infographic...' : 'Ask for changes, e.g. make the headline bolder...'}" rows="1" onkeydown="handleChatKey(event)"></textarea>
             <button class="chat-send-btn" onclick="sendChatMessage()" id="chatSendBtn" title="Send">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             </button>
@@ -296,7 +296,7 @@ function renderChatMessages() {
     return `<div class="chat-empty">
       <div class="chat-empty-icon">💬</div>
       <div class="chat-empty-title">Start the conversation</div>
-      <div class="chat-empty-sub">Generate your first infographic or type a message to get started. Claude will remember every version.</div>
+      <div class="chat-empty-sub">Generate your infographic or type a message to get started. Claude will remember every version.</div>
     </div>`;
   }
 
