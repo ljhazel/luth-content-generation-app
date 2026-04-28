@@ -406,8 +406,8 @@ Source: ${row['Source'] || 'Luth Research — luthresearch.com'}
 
 Brand guidelines:
 - Colors: #26455D (dark blue), #9D2D3F (red), #96B2B8 (blue-grey), #DEEBF5 (light blue background), #4B616D (medium blue)
-- Primary font: Helvetica, Arial, sans-serif (body text, labels, captions, data points)
-- Secondary font: Zilla Slab (headings and titles only) — load via Google Fonts in the HTML head: <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&display=swap" rel="stylesheet">
+- Primary font: Helvetica (headings, titles, numbers, and data points)
+- Secondary font: Zilla Slab (body text and descriptive copy only — never use for headlines, titles, stats, or numbers) — load via Google Fonts in the HTML head: <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&display=swap" rel="stylesheet">
 - Always include the Google Fonts link tag in the generated HTML head section
 - Style: Clean, professional, data-driven, B2B
 - Include Luth Research branding visibly
@@ -416,7 +416,7 @@ Brand guidelines:
 
 Technical rules — follow exactly:
 - Canvas must be exactly 1200x627px
-- External fonts are allowed via Google Fonts only — always load Zilla Slab for headings
+- External fonts are allowed via Google Fonts only — always load Zilla Slab for body text and descriptive copy only
 - No JavaScript, no animations, no CSS transitions
 - All content visible immediately on page load
 - Single embedded style block only
