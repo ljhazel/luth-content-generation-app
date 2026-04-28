@@ -461,6 +461,275 @@
     animation: poll 2s linear infinite;
   }
   @keyframes poll { to { left: 150%; } }
+
+  /* Chat interface */
+  .main-with-chat {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 0;
+    height: calc(100vh - 64px);
+    overflow: hidden;
+  }
+
+  .preview-panel {
+    padding: 28px 32px;
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+  }
+
+  .chat-panel {
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    height: 100%;
+  }
+
+  .chat-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .chat-header-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--lr-navy);
+  }
+
+  .chat-version-count {
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface);
+    padding: 2px 8px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .chat-msg {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .chat-msg-user {
+    align-items: flex-end;
+  }
+
+  .chat-msg-claude {
+    align-items: flex-start;
+  }
+
+  .chat-bubble {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .chat-bubble-user {
+    background: var(--lr-navy);
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+
+  .chat-bubble-claude {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+  }
+
+  .chat-bubble-thinking {
+    background: var(--lr-sky);
+    color: var(--lr-slate);
+    border: 1px solid var(--lr-mist);
+    font-style: italic;
+  }
+
+  .chat-msg-meta {
+    font-size: 10px;
+    color: var(--muted);
+    padding: 0 4px;
+  }
+
+  .chat-version-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--lr-sky);
+    border: 1px solid var(--lr-mist);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: var(--lr-navy);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 4px;
+  }
+
+  .chat-version-pill:hover {
+    background: var(--lr-navy);
+    color: white;
+    border-color: var(--lr-navy);
+  }
+
+  .chat-version-pill.active {
+    background: var(--lr-navy);
+    color: white;
+    border-color: var(--lr-navy);
+  }
+
+  .chat-input-area {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--white);
+  }
+
+  .chat-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+  }
+
+  .chat-textarea {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    resize: none;
+    min-height: 44px;
+    max-height: 120px;
+    outline: none;
+    transition: border-color 0.2s;
+    line-height: 1.5;
+  }
+
+  .chat-textarea:focus { border-color: var(--lr-navy); }
+
+  .chat-send-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--lr-navy);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+
+  .chat-send-btn:hover { background: #1d3447; }
+  .chat-send-btn:disabled { background: var(--lr-mist); cursor: not-allowed; }
+
+  .chat-hint {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  .chat-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    padding: 24px;
+    color: var(--muted);
+    gap: 8px;
+  }
+
+  .chat-empty-icon {
+    font-size: 28px;
+    margin-bottom: 4px;
+  }
+
+  .chat-empty-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--lr-navy);
+  }
+
+  .chat-empty-sub {
+    font-size: 12px;
+    line-height: 1.5;
+    max-width: 240px;
+  }
+
+  /* Version navigation in preview */
+  .version-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .version-nav-label {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .version-chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .version-chip {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .version-chip:hover { border-color: var(--lr-navy); color: var(--lr-navy); }
+  .version-chip.active { background: var(--lr-navy); color: white; border-color: var(--lr-navy); }
+
+  .typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 8px 4px;
+  }
+
+  .typing-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--lr-mist);
+    animation: typingBounce 1.2s infinite;
+  }
+
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes typingBounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+  }
+
 </style>
 </head>
 <body>
@@ -529,6 +798,11 @@ let selectedRow = null;
 let generatedHTML = null;
 let pollInterval = null;
 let knownRowCount = 0;
+
+// Conversation memory
+let conversationHistory = [];  // Full message history for Claude
+let versionHistory = [];       // { html, thinking, feedback, timestamp }
+let activeVersion = -1;        // Index of currently displayed version
 
 // Restore saved API key on load
 window.addEventListener('load', () => {
@@ -647,6 +921,11 @@ function renderRows() {
 
 function selectRow(i) {
   selectedRow = sheetData[i];
+  // Reset conversation state for new row
+  conversationHistory = [];
+  versionHistory = [];
+  activeVersion = -1;
+  generatedHTML = null;
   document.querySelectorAll('.row-card').forEach((el, idx) => {
     el.classList.toggle('selected', idx === i);
   });
@@ -660,122 +939,279 @@ function renderMain() {
   const isRun = status === 'RUN';
   const isApproved = (row['Approved'] || '').toString().toUpperCase() === 'YES';
 
+  const versionsHtml = versionHistory.length > 0 ? `
+    <div class="version-nav">
+      <span class="version-nav-label">Versions:</span>
+      <div class="version-chips">
+        ${versionHistory.map((v, i) => `
+          <span class="version-chip ${i === activeVersion ? 'active' : ''}" onclick="loadVersion(${i})">
+            v${i + 1}
+          </span>`).join('')}
+      </div>
+    </div>` : '';
+
   document.getElementById('mainArea').innerHTML = `
-    <div class="infographic-header">
-      <div>
-        <div class="infographic-title">${row['Title'] || 'Untitled'}</div>
-        <div class="infographic-sub">${row['Description'] || ''}</div>
-      </div>
-      <div class="action-row">
-        ${isRun ? `<button class="btn btn-primary" onclick="generateInfographic()" id="generateBtn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          Generate
-        </button>` : ''}
-        ${generatedHTML ? `
-          <button class="btn btn-outline" onclick="downloadPNG()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Download PNG
-          </button>
-          <button class="btn btn-success" onclick="approveInfographic()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            Approve
-          </button>
-        ` : ''}
-      </div>
-    </div>
+    <div class="main-with-chat">
+      <div class="preview-panel">
+        <div class="infographic-header">
+          <div>
+            <div class="infographic-title">${row['Title'] || 'Untitled'}</div>
+            <div class="infographic-sub">${row['Description'] || ''}</div>
+          </div>
+          <div class="action-row">
+            ${isRun && versionHistory.length === 0 ? `<button class="btn btn-primary" onclick="startGeneration()" id="generateBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Generate
+            </button>` : ''}
+            ${generatedHTML ? `
+              <button class="btn btn-outline" onclick="downloadPNG()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download
+              </button>
+              <button class="btn btn-success" onclick="approveInfographic()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                Approve
+              </button>
+            ` : ''}
+          </div>
+        </div>
 
-    <div class="content-details">
-      <div class="detail-item">
-        <label>Target Audience</label>
-        <p>${row['Target Audience'] || '—'}</p>
-      </div>
-      <div class="detail-item">
-        <label>Source</label>
-        <p>${row['Source'] || '—'}</p>
-      </div>
-      <div class="detail-item full">
-        <label>Key Stats</label>
-        <p>${row['Key Stats'] || '—'}</p>
-      </div>
-      <div class="detail-item full">
-        <label>Core Insight</label>
-        <p>${row['Core Insight'] || '—'}</p>
-      </div>
-    </div>
+        <div class="content-details">
+          <div class="detail-item">
+            <label>Target Audience</label>
+            <p>${row['Target Audience'] || '—'}</p>
+          </div>
+          <div class="detail-item">
+            <label>Source</label>
+            <p>${row['Source'] || '—'}</p>
+          </div>
+          <div class="detail-item full">
+            <label>Key Stats</label>
+            <p>${row['Key Stats'] || '—'}</p>
+          </div>
+          <div class="detail-item full">
+            <label>Core Insight</label>
+            <p>${row['Core Insight'] || '—'}</p>
+          </div>
+        </div>
 
-    ${isApproved ? '<div class="approved-banner">✓ This infographic has been approved and is ready for HubSpot upload.</div>' : ''}
+        ${isApproved ? '<div class="approved-banner">✓ Approved and ready for HubSpot upload.</div>' : ''}
+        ${versionsHtml}
 
-    <div class="preview-frame" id="previewFrame">
-      ${generatedHTML ? `<iframe class="preview-iframe" id="previewIframe" style="height:627px" srcdoc="${escapeHtml(generatedHTML)}"></iframe>`
-      : `<div class="preview-loading"><div style="font-size:40px">🖼</div><p>${isRun ? 'Click Generate to create your infographic' : 'Set Column D to RUN to enable generation'}</p></div>`}
-    </div>
+        <div class="preview-frame" id="previewFrame">
+          ${generatedHTML
+            ? `<iframe class="preview-iframe" id="previewIframe" style="height:627px" srcdoc="${escapeHtml(generatedHTML)}"></iframe>`
+            : `<div class="preview-loading"><div style="font-size:40px">🖼</div><p>${isRun ? 'Click Generate or type a message to start' : 'Set Column D to RUN to enable generation'}</p></div>`}
+        </div>
+      </div>
 
-    <div class="feedback-block">
-      <label>Feedback / Revision Notes</label>
-      <textarea id="feedbackInput" placeholder="e.g. Make it less boxy, add more color, adjust the headline...">${row['Feedback'] || ''}</textarea>
-    </div>
-
-    <div class="action-row">
-      ${generatedHTML ? `
-        <button class="btn btn-primary" onclick="regenerateWithFeedback()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
-          Regenerate with Feedback
-        </button>
-      ` : ''}
+      <div class="chat-panel">
+        <div class="chat-header">
+          <span class="chat-header-title">Design Chat</span>
+          ${versionHistory.length > 0 ? `<span class="chat-version-count">${versionHistory.length} version${versionHistory.length > 1 ? 's' : ''}</span>` : ''}
+        </div>
+        <div class="chat-messages" id="chatMessages">
+          ${renderChatMessages()}
+        </div>
+        <div class="chat-input-area">
+          <div class="chat-input-row">
+            <textarea class="chat-textarea" id="chatInput" placeholder="${versionHistory.length === 0 ? 'Generate your first infographic...' : 'Ask for changes, e.g. make the headline bolder...'}" rows="1" onkeydown="handleChatKey(event)"></textarea>
+            <button class="chat-send-btn" onclick="sendChatMessage()" id="chatSendBtn" title="Send">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+          <div class="chat-hint">
+            ${versionHistory.length > 0 ? 'Claude remembers all previous versions. You can ask to go back to v1, v2, etc.' : 'Describe what you want or click Generate above'}
+          </div>
+        </div>
+      </div>
     </div>
   `;
+}
+
+function renderChatMessages() {
+  if (conversationHistory.length === 0) {
+    return `<div class="chat-empty">
+      <div class="chat-empty-icon">💬</div>
+      <div class="chat-empty-title">Start the conversation</div>
+      <div class="chat-empty-sub">Generate your first infographic or type a message to get started. Claude will remember every version.</div>
+    </div>`;
+  }
+
+  return conversationHistory.map((msg, i) => {
+    if (msg.role === 'user') {
+      return `<div class="chat-msg chat-msg-user">
+        <div class="chat-bubble chat-bubble-user">${escapeDisplay(msg.displayText || msg.content)}</div>
+        <div class="chat-msg-meta">${msg.time || ''}</div>
+      </div>`;
+    } else {
+      const vIdx = msg.versionIndex;
+      return `<div class="chat-msg chat-msg-claude">
+        <div class="chat-bubble chat-bubble-claude">${escapeDisplay(msg.thinking || 'Generating...')}</div>
+        ${vIdx !== undefined ? `<span class="chat-version-pill ${vIdx === activeVersion ? 'active' : ''}" onclick="loadVersion(${vIdx})">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          View v${vIdx + 1}
+        </span>` : ''}
+        <div class="chat-msg-meta">${msg.time || ''}</div>
+      </div>`;
+    }
+  }).join('');
+}
+
+function escapeDisplay(text) {
+  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function scrollChatToBottom() {
+  const el = document.getElementById('chatMessages');
+  if (el) el.scrollTop = el.scrollHeight;
+}
+
+function addTypingIndicator() {
+  const el = document.getElementById('chatMessages');
+  if (!el) return;
+  const div = document.createElement('div');
+  div.className = 'chat-msg chat-msg-claude';
+  div.id = 'typingIndicator';
+  div.innerHTML = `<div class="chat-bubble chat-bubble-claude">
+    <div class="typing-indicator">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    </div>
+  </div>`;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+
+function removeTypingIndicator() {
+  const el = document.getElementById('typingIndicator');
+  if (el) el.remove();
+}
+
+function loadVersion(idx) {
+  if (idx < 0 || idx >= versionHistory.length) return;
+  activeVersion = idx;
+  generatedHTML = versionHistory[idx].html;
+  const frame = document.getElementById('previewFrame');
+  if (frame) {
+    frame.innerHTML = `<iframe class="preview-iframe" style="height:627px" srcdoc="${escapeHtml(generatedHTML)}"></iframe>`;
+  }
+  // Update version chips
+  document.querySelectorAll('.version-chip').forEach((chip, i) => {
+    chip.classList.toggle('active', i === idx);
+  });
+  // Update version pills in chat
+  document.querySelectorAll('.chat-version-pill').forEach(pill => {
+    const pillIdx = parseInt(pill.getAttribute('onclick').match(/\d+/)[0]);
+    pill.classList.toggle('active', pillIdx === idx);
+  });
+  // Update version nav header count
+  const countEl = document.querySelector('.chat-version-count');
+  if (countEl) countEl.textContent = `${versionHistory.length} version${versionHistory.length > 1 ? 's' : ''}`;
+}
+
+function handleChatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendChatMessage();
+  }
+}
+
+function startGeneration() {
+  sendChatMessage('Generate an infographic based on the content brief.');
 }
 
 function escapeHtml(html) {
   return html.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
-async function generateInfographic() {
-  const apiKey = document.getElementById('apiKey').value.trim();
-  if (!apiKey) { showToast('Please enter your Anthropic API key first.', 'error'); return; }
-
+function buildSystemPrompt() {
   const row = selectedRow;
-  const feedback = document.getElementById('feedbackInput')?.value || '';
-  
-  document.getElementById('generateBtn').disabled = true;
-  document.getElementById('previewFrame').innerHTML = `
-    <div class="preview-loading">
-      <div class="spinner"></div>
-      <p>Claude is designing your infographic...</p>
-    </div>`;
-  setStatus('Generating...', false);
+  return `You are a visual designer and creative collaborator for Luth Research, a consumer intelligence company.
 
-  const prompt = `You are a visual designer for Luth Research, a consumer intelligence company.
+You are working with the user to design a LinkedIn infographic. You have memory of all previous versions in this conversation.
 
-Create a visually compelling LinkedIn infographic as a single self-contained HTML file.
-
-Content:
+Content brief:
 Title: ${row['Title'] || ''}
 Description: ${row['Description'] || ''}
 Key Stats: ${row['Key Stats'] || ''}
 Target Audience: ${row['Target Audience'] || ''}
 Core Insight: ${row['Core Insight'] || ''}
 Source: ${row['Source'] || 'Luth Research — luthresearch.com'}
-${feedback ? `Design feedback to incorporate: ${feedback}` : ''}
 
 Brand guidelines:
 - Colors: #26455D (dark blue), #9D2D3F (red), #96B2B8 (blue-grey), #DEEBF5 (light blue background), #4B616D (medium blue)
 - Font: Helvetica, Arial, sans-serif
 - Style: Clean, professional, data-driven, B2B
-- Include "Luth Research" branding visibly
+- Include Luth Research branding visibly
 - Use circles and rounded shapes — avoid purely boxy layouts
 - Use at least 3 brand colors throughout
 
-Technical rules — follow exactly or the image will fail to render:
+Technical rules — follow exactly:
 - Canvas must be exactly 1200x627px
-- No external fonts, no Google Fonts, no external resources of any kind
+- No external fonts, no Google Fonts, no external resources
 - No JavaScript, no animations, no CSS transitions
-- All content visible immediately on page load with no delay
+- All content visible immediately on page load
 - Single embedded style block only
-- All elements must sit within 1200x627px — nothing outside the container
-- Use only static CSS properties
-- Return ONLY raw HTML starting with <!DOCTYPE html>
-- No markdown, no code fences, no explanation text before or after`;
+- All elements within 1200x627px container
+- Static CSS only
+
+RESPONSE FORMAT — always respond in two parts:
+1. THINKING: One to three sentences explaining what you are doing and why — your design reasoning in plain English
+2. HTML: The complete infographic HTML
+
+Format your response exactly like this:
+THINKING: [your reasoning here]
+HTML: [complete <!DOCTYPE html> code here]
+
+When the user asks to go back to a previous version, reproduce that version's HTML exactly.
+When the user asks to keep something the same, preserve it precisely and only change what they ask.`;
+}
+
+async function sendChatMessage(overrideText) {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  if (!apiKey) { showToast('Please enter your Anthropic API key first.', 'error'); return; }
+  if (!selectedRow) return;
+
+  const inputEl = document.getElementById('chatInput');
+  const userText = overrideText || (inputEl ? inputEl.value.trim() : '');
+  if (!userText) return;
+
+  const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  // Add user message to conversation
+  conversationHistory.push({
+    role: 'user',
+    content: userText,
+    displayText: userText,
+    time: now
+  });
+
+  if (inputEl) inputEl.value = '';
+  setStatus('Generating...', false);
+
+  // Show user message and typing indicator
+  const chatEl = document.getElementById('chatMessages');
+  if (chatEl) {
+    chatEl.innerHTML = renderChatMessages();
+    scrollChatToBottom();
+  }
+  addTypingIndicator();
+
+  // Show loading in preview
+  const previewFrame = document.getElementById('previewFrame');
+  if (previewFrame) {
+    previewFrame.innerHTML = `<div class="preview-loading"><div class="spinner"></div><p>Claude is designing...</p></div>`;
+  }
+
+  // Build messages array for API — include full history
+  const messages = conversationHistory
+    .filter(m => m.role === 'user' || m.role === 'assistant')
+    .map(m => ({
+      role: m.role,
+      content: m.role === 'user' ? m.content : m.rawResponse || m.content
+    }));
 
   try {
     const response = await fetch('/api/generate', {
@@ -787,24 +1223,128 @@ Technical rules — follow exactly or the image will fail to render:
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
         max_tokens: 4000,
-        messages: [{ role: 'user', content: prompt }]
+        system: buildSystemPrompt(),
+        messages
       })
     });
 
     const data = await response.json();
     if (!response.ok) throw new Error(data.error?.message || 'API error');
 
-    let html = data.content[0].text;
-    html = html.replace(/^```html\n?/i, '').replace(/^```\n?/i, '').replace(/```$/i, '').trim();
+    const rawResponse = data.content[0].text;
+
+    // Parse THINKING and HTML from response
+    let thinking = '';
+    let html = '';
+
+    const thinkingMatch = rawResponse.match(/THINKING:\s*([\s\S]*?)(?=HTML:|$)/i);
+    const htmlMatch = rawResponse.match(/HTML:\s*([\s\S]*)/i);
+
+    if (thinkingMatch) thinking = thinkingMatch[1].trim();
+    if (htmlMatch) {
+      html = htmlMatch[1].trim()
+        .replace(/^```html\n?/i, '')
+        .replace(/^```\n?/i, '')
+        .replace(/```$/i, '')
+        .trim();
+    }
+
+    // Fallback if format not followed
+    if (!html) {
+      html = rawResponse.replace(/^```html\n?/i, '').replace(/^```\n?/i, '').replace(/```$/i, '').trim();
+      thinking = 'Here is the updated infographic.';
+    }
+
+    // Save version
+    const versionIdx = versionHistory.length;
+    versionHistory.push({ html, thinking, timestamp: now });
+    activeVersion = versionIdx;
     generatedHTML = html;
 
-    document.getElementById('previewFrame').innerHTML = `<iframe class="preview-iframe" id="previewIframe" style="height:627px" srcdoc="${escapeHtml(html)}"></iframe>`;
+    // Add assistant message to history
+    conversationHistory.push({
+      role: 'assistant',
+      content: thinking,
+      rawResponse,
+      thinking,
+      versionIndex: versionIdx,
+      time: now
+    });
+
+    // Update UI
+    removeTypingIndicator();
+    if (chatEl) {
+      chatEl.innerHTML = renderChatMessages();
+      scrollChatToBottom();
+    }
+
+    // Update preview
+    if (previewFrame) {
+      previewFrame.innerHTML = `<iframe class="preview-iframe" style="height:627px" srcdoc="${escapeHtml(html)}"></iframe>`;
+    }
+
+    // Update version nav
+    const versionNav = document.querySelector('.version-nav');
+    if (!versionNav) {
+      const previewPanel = document.querySelector('.preview-panel');
+      if (previewPanel) {
+        const navDiv = document.createElement('div');
+        navDiv.className = 'version-nav';
+        navDiv.innerHTML = `<span class="version-nav-label">Versions:</span>
+          <div class="version-chips">
+            ${versionHistory.map((v, i) => `<span class="version-chip ${i === activeVersion ? 'active' : ''}" onclick="loadVersion(${i})">v${i + 1}</span>`).join('')}
+          </div>`;
+        previewFrame.insertAdjacentElement('beforebegin', navDiv);
+      }
+    } else {
+      versionNav.innerHTML = `<span class="version-nav-label">Versions:</span>
+        <div class="version-chips">
+          ${versionHistory.map((v, i) => `<span class="version-chip ${i === activeVersion ? 'active' : ''}" onclick="loadVersion(${i})">v${i + 1}</span>`).join('')}
+        </div>`;
+    }
+
+    // Update action buttons
+    const actionRow = document.querySelector('.action-row');
+    if (actionRow) {
+      actionRow.innerHTML = `
+        <button class="btn btn-outline" onclick="downloadPNG()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download
+        </button>
+        <button class="btn btn-success" onclick="approveInfographic()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Approve
+        </button>`;
+    }
+
+    // Update chat hint
+    const hint = document.querySelector('.chat-hint');
+    if (hint) hint.textContent = 'Claude remembers all previous versions. Ask to go back to v1, v2, etc.';
+
+    const versionCountEl = document.querySelector('.chat-version-count');
+    if (versionCountEl) {
+      versionCountEl.textContent = `${versionHistory.length} version${versionHistory.length > 1 ? 's' : ''}`;
+    } else {
+      const chatHeader = document.querySelector('.chat-header');
+      if (chatHeader) {
+        const span = document.createElement('span');
+        span.className = 'chat-version-count';
+        span.textContent = `${versionHistory.length} version${versionHistory.length > 1 ? 's' : ''}`;
+        chatHeader.appendChild(span);
+      }
+    }
+
     setStatus('Generated successfully');
-    showToast('Infographic created! Review and approve below.');
-    renderMain();
+    showToast(`Version ${versionIdx + 1} ready`);
 
   } catch(e) {
-    document.getElementById('previewFrame').innerHTML = `<div class="preview-loading"><p style="color:#9D2D3F">Error: ${e.message}</p></div>`;
+    removeTypingIndicator();
+    if (previewFrame) {
+      previewFrame.innerHTML = `<div class="preview-loading"><p style="color:#9D2D3F">Error: ${e.message}</p></div>`;
+    }
+    // Remove failed user message from history
+    conversationHistory.pop();
+    if (chatEl) chatEl.innerHTML = renderChatMessages();
     setStatus('Error', false);
     showToast('Generation failed: ' + e.message, 'error');
   }
@@ -812,7 +1352,7 @@ Technical rules — follow exactly or the image will fail to render:
 
 async function regenerateWithFeedback() {
   generatedHTML = null;
-  await generateInfographic();
+  await sendChatMessage();
 }
 
 function approveInfographic() {
