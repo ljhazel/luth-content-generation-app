@@ -469,12 +469,18 @@
     gap: 0;
     height: calc(100vh - 64px);
     overflow: hidden;
+    position: fixed;
+    top: 64px;
+    left: 360px;
+    right: 0;
+    bottom: 0;
   }
 
   .preview-panel {
     padding: 28px 32px;
     overflow-y: auto;
     border-right: 1px solid var(--border);
+    height: 100%;
   }
 
   .chat-panel {
@@ -482,6 +488,8 @@
     flex-direction: column;
     background: var(--white);
     height: 100%;
+    max-height: calc(100vh - 64px);
+    overflow: hidden;
   }
 
   .chat-header {
@@ -514,6 +522,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    min-height: 0;
   }
 
   .chat-msg {
@@ -919,17 +928,73 @@ function renderRows() {
   }).join('');
 }
 
+function saveSession() {
+  if (!selectedRow) return;
+  const key = 'lr_session_' + (selectedRow['Title'] || 'untitled').replace(/\s+/g, '_');
+  const session = {
+    conversationHistory: conversationHistory.map(m => ({
+      role: m.role,
+      content: m.content,
+      displayText: m.displayText,
+      thinking: m.thinking,
+      versionIndex: m.versionIndex,
+      time: m.time,
+      rawResponse: m.rawResponse
+    })),
+    versionHistory: versionHistory.map(v => ({
+      html: v.html,
+      thinking: v.thinking,
+      timestamp: v.timestamp
+    })),
+    activeVersion,
+    rowTitle: selectedRow['Title']
+  };
+  try {
+    localStorage.setItem(key, JSON.stringify(session));
+  } catch(e) {
+    // localStorage full — clear oldest sessions
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('lr_session_'));
+    if (keys.length > 0) {
+      localStorage.removeItem(keys[0]);
+      localStorage.setItem(key, JSON.stringify(session));
+    }
+  }
+}
+
+function restoreSession(row) {
+  const key = 'lr_session_' + (row['Title'] || 'untitled').replace(/\s+/g, '_');
+  try {
+    const saved = localStorage.getItem(key);
+    if (saved) {
+      const session = JSON.parse(saved);
+      conversationHistory = session.conversationHistory || [];
+      versionHistory = session.versionHistory || [];
+      activeVersion = session.activeVersion ?? -1;
+      generatedHTML = activeVersion >= 0 && versionHistory[activeVersion]
+        ? versionHistory[activeVersion].html : null;
+      return true;
+    }
+  } catch(e) {}
+  return false;
+}
+
 function selectRow(i) {
   selectedRow = sheetData[i];
-  // Reset conversation state for new row
-  conversationHistory = [];
-  versionHistory = [];
-  activeVersion = -1;
-  generatedHTML = null;
+  // Try to restore previous session for this row
+  const restored = restoreSession(selectedRow);
+  if (!restored) {
+    conversationHistory = [];
+    versionHistory = [];
+    activeVersion = -1;
+    generatedHTML = null;
+  }
   document.querySelectorAll('.row-card').forEach((el, idx) => {
     el.classList.toggle('selected', idx === i);
   });
   renderMain();
+  if (restored && generatedHTML) {
+    showToast('Previous session restored — ' + versionHistory.length + ' version(s) loaded');
+  }
 }
 
 function renderMain() {
@@ -1270,6 +1335,9 @@ async function sendChatMessage(overrideText) {
       versionIndex: versionIdx,
       time: now
     });
+
+    // Persist session to localStorage
+    saveSession();
 
     // Update UI
     removeTypingIndicator();
