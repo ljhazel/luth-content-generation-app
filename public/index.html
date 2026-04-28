@@ -869,6 +869,38 @@
 
   .btn-clear-history:hover { color: var(--lr-red); }
 
+
+  /* Reference Library */
+  .reference-section {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .reference-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .btn-load-refs {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 10px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--lr-slate);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-load-refs:hover {
+    border-color: var(--lr-navy);
+    color: var(--lr-navy);
+  }
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
@@ -905,6 +937,17 @@
     <br>
     <div class="row-list" id="rowList">
       <div class="empty-state">Loading your sheet...</div>
+    </div>
+
+    <!-- Reference Library -->
+    <div class="reference-section">
+      <div class="reference-header">
+        <div class="section-label" style="margin:0">Style References</div>
+        <button class="btn-load-refs" onclick="loadReferenceLibrary()">Load</button>
+      </div>
+      <div id="referenceList">
+        <div style="font-size:11px;color:var(--muted);padding:4px 0;">Click Load to browse your infographic library. Select up to 3 for Claude to reference.</div>
+      </div>
     </div>
 
     <!-- Content History -->
